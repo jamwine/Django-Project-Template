@@ -7,6 +7,10 @@ up:
 down:
 	docker compose -f local.yml down
 
+restart:
+	@$(MAKE) down
+	@$(MAKE) up
+
 show-logs:
 	docker compose -f local.yml logs
 
@@ -17,7 +21,11 @@ makemigrations:
 	docker compose -f local.yml run --rm api python manage.py makemigrations
 
 migrate:
-	docker compose -f local.yml run --rm api python manage.py migrate
+	docker compose -f local.yml run --rm api python manage.py migrate  --run-syncdb
+
+make-migrate:
+	@$(MAKE) makemigrations
+	@$(MAKE) migrate
 
 collectstatic:
 	docker compose -f local.yml run --rm api python manage.py collectstatic --no-input --clear

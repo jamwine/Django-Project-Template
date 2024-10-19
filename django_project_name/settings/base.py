@@ -48,9 +48,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-INSTALLED_APPS
-
-
 ROOT_URLCONF = "django_project_name.urls"
 
 TEMPLATES = [
@@ -161,3 +158,4 @@ LOGGING = {
     "root": {"level": "INFO", "handlers": ["console"]},
 }
 
+AUTH_USER_MODEL = "users.User"
