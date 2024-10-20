@@ -11,6 +11,15 @@ restart:
 	@$(MAKE) down
 	@$(MAKE) up
 
+backup-db:
+	docker compose -f local.yml exec postgres backup
+
+show-backups:
+	docker compose -f local.yml exec postgres backups
+
+restore-db:
+	docker compose -f local.yml exec postgres restore ${backup_id}
+
 show-logs:
 	docker compose -f local.yml logs
 

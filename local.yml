@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  api:
+    api:
         build:
             context: .
             dockerfile: ./docker/local/django/Dockerfile
@@ -18,10 +18,11 @@ services:
         depends_on:
             - postgres
             - mailhog
+            - redis
         networks:
             - django-api
 
-  postgres:
+    postgres:
         build:
             context: .
             dockerfile: ./docker/local/postgres/Dockerfile
@@ -33,15 +34,56 @@ services:
         networks:
             - django-api
 
-  mailhog:
+    mailhog:
         image: mailhog/mailhog:v1.0.0
         container_name: mailhog
         ports:
             - "8025:8025"
         networks:
             - django-api
-  
-  nginx:
+    
+    redis:
+        image: redis:7-alpine
+        container_name: redis
+        networks:
+            - django-api
+
+    celery_worker:
+        build:
+            context: .
+            dockerfile: ./docker/local/django/Dockerfile
+        command: /start-celeryworker
+        volumes:
+            - .:/app
+        env_file:
+            - ./.envs/.local/.django
+            - ./.envs/.local/.postgres
+        depends_on:
+            - mailhog
+            - redis
+            - postgres
+        networks:
+            - django-api
+            
+    flower:
+        build:
+            context: .
+            dockerfile: ./docker/local/django/Dockerfile
+        command: /start-flower
+        volumes:
+            - flower_data:/data
+        env_file:
+            - ./.envs/.local/.django
+            - ./.envs/.local/.postgres
+        depends_on:
+            - redis
+            - postgres
+        ports:
+            - "5555:5555"
+        networks:
+            - django-api
+
+    nginx:
         build:
             context: .
             dockerfile: ./docker/local/nginx/Dockerfile
@@ -65,3 +107,4 @@ volumes:
     media_volume:
     local_postgres_data: {}
     local_postgres_data_backups: {}
+    flower_data: {}
