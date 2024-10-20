@@ -1,3 +1,7 @@
+# Define variables
+PG_USERNAME := admin
+DB_NAME := django_demo_db 
+
 build:
 	docker compose -f local.yml up --build -d --remove-orphans
 
@@ -26,6 +30,9 @@ show-logs:
 show-logs-api:
 	docker compose -f local.yml logs api
 
+django-shell:
+	docker compose -f local.yml run --rm api python manage.py shell
+
 makemigrations:
 	docker compose -f local.yml run --rm api python manage.py makemigrations
 
@@ -48,11 +55,16 @@ down-v:
 volume:
 	docker volume inspect django-production_local_postgres_data
 
-access-db:
-	docker compose -f local.yml exec postgres psql --username=jamwine --dbname=django_demo_db
+reset-db:
+	@docker compose -f local.yml exec postgres psql --username=$(PG_USERNAME) --dbname=postgres -c "DROP DATABASE IF EXISTS $(DB_NAME);"
+	@docker compose -f local.yml exec postgres psql --username=$(PG_USERNAME) --dbname=postgres -c "CREATE DATABASE $(DB_NAME);"
+	@$(MAKE) make-migrate
 
-terminate-db-connections:
-	docker compose -f local.yml exec postgres psql --username=jamwine --dbname=django_demo_db -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'django_demo_db' AND pid <> pg_backend_pid();"
+access-db:
+	docker compose -f local.yml exec postgres psql --username=${PG_USERNAME} --dbname=${DB_NAME}
+
+terminate-db-sessions:
+	docker compose -f local.yml exec postgres psql --username=${PG_USERNAME} --dbname=${DB_NAME} -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'django_demo_db' AND pid <> pg_backend_pid();"
 
 flake8:
 	docker compose -f local.yml exec api flake8 .

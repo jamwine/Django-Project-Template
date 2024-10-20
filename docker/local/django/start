@@ -1,11 +1,20 @@
 #!/bin/bash
 
 set -o errexit
-
 set -o pipefail
-
 set -o nounset
 
+# Run Django migrations and collect static files
+echo "Applying migrations..."
 python manage.py migrate --no-input
+
+echo "Collecting static files..."
 python manage.py collectstatic --no-input
-exec python manage.py runserver 0.0.0.0:8000
+
+# Start Django server in the background
+echo "Starting Django server..."
+python manage.py runserver 0.0.0.0:8000 &
+
+# Start Jupyter Lab in the foreground
+echo "Starting Jupyter Lab..."
+exec jupyter lab --ip=0.0.0.0 --port=8890 --no-browser --allow-root --config=/root/.jupyter/jupyter_server_config.py

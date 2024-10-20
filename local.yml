@@ -12,6 +12,9 @@ services:
             - media_volume:/app/mediafiles
         expose:
             - "8000"
+        ports:
+            - "8000:8000"  # Django
+            - "8890:8890"  # Jupyter
         env_file:
             - ./.envs/.local/.django
             - ./.envs/.local/.postgres
@@ -98,6 +101,23 @@ services:
         networks:
             - django-api
 
+    # jupyter:
+    #     build:
+    #         context: .
+    #         dockerfile: ./docker/local/django/jupyter/Dockerfile
+    #     ports:
+    #         - "8890:8888"
+    #     volumes:
+    #         - django-jupyter-notebooks:/home/jovyan/django-jupyter-notebooks
+    #         - static_volume:/app/staticfiles
+    #         - media_volume:/app/mediafiles
+    #     environment:
+    #         - JUPYTER_ENABLE_LAB=yes
+    #         - DJANGO_SETTINGS_MODULE=django_project_name.settings.local
+    #     command: start-notebook.sh --NotebookApp.token='admin' --NotebookApp.password=''  # Use empty password for easy access
+    #     networks:
+    #         - django-api
+
 networks:
     django-api:
         driver: bridge
@@ -108,3 +128,4 @@ volumes:
     local_postgres_data: {}
     local_postgres_data_backups: {}
     flower_data: {}
+    django-jupyter-notebooks: {}

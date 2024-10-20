@@ -18,24 +18,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
 
-    # # Custom related_name for groups to avoid reverse accessor conflicts
-    # groups = models.ManyToManyField(
-    #     Group,
-    #     related_name='custom_user_groups',  # Avoiding reverse accessor clash
-    #     blank=True,
-    #     help_text=_('The groups this user belongs to. A user will get all permissions granted to each of their groups.'),
-    #     verbose_name=_('groups')
-    # )
-
-    # # Custom related_name for user_permissions to avoid reverse accessor conflicts
-    # user_permissions = models.ManyToManyField(
-    #     Permission,
-    #     related_name='custom_user_permissions',  # Avoiding reverse accessor clash
-    #     blank=True,
-    #     help_text=_('Specific permissions for this user.'),
-    #     verbose_name=_('user permissions')
-    # )
-
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
