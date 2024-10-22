@@ -30,6 +30,7 @@ urlpatterns = [
         PasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
     ),
+    path("api/v1/profiles/", include("django_apps.profiles.urls")),
 ]
 
 admin.site.site_header = "Django Project Template Admin"
